@@ -1,32 +1,43 @@
 package com.unicesumar.adsis4s2021.dozero.meu.musica;
 
-import java.util.Objects;
-import java.util.UUID;
-
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
+
+import com.unicesumar.adsis4s2021.dozero.meu.album.Album;
+import com.unicesumar.adsis4s2021.dozero.meu.base.BaseEntity;
 
 @Entity
-public class Musica {
-	@Id
-	private String id;
+@NamedNativeQuery(
+		   name = "qr_encontrar_nome_album_dto",
+		   query = "SELECT nome from album",
+		   resultSetMapping = "rs_mapping_nome_album_dto"
+		)
+@SqlResultSetMapping(
+	    name = "rs_mapping_nome_album_dto",
+	    classes = @ConstructorResult(
+	        targetClass = NomeAlbumDTO.class,
+	        columns = {
+	            @ColumnResult(name = "nome", type = String.class)
+	        }
+	    )
+	)
+public class Musica extends BaseEntity {
+	
 	@Column(nullable = false)
 	private String nome;
+	
 	@Column(nullable = false)
 	private String duracao;
 	
-	public Musica() {
-		this.id = UUID.randomUUID().toString();
-	}
-	
-	public Musica(String id) {
-		this.id = id;
-	}
-	
-	public String getId() {
-		return id;
-	}
+	@ManyToOne
+	@JoinColumn(name = "album_id")
+	private Album album;
 	
 	public String getNome() {
 		return nome;
@@ -43,22 +54,13 @@ public class Musica {
 	public void setDuracao(String duracao) {
 		this.duracao = duracao;
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
+	
+	public Album getAlbum() {
+		return album;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Musica other = (Musica) obj;
-		return Objects.equals(id, other.id);
+	
+	public void setAlbum(Album album) {
+		this.album = album;
 	}
 	
 }
